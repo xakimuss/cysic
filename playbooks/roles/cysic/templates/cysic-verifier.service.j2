@@ -1,0 +1,13 @@
+[Unit]
+Description=Cysic Verifier Node
+After=network.target
+
+[Service]
+User=cysic
+ExecStart=/bin/bash /home/cysic/cysic-verifier/start.sh
+WorkingDirectory=/home/cysic/cysic-verifier
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,40 @@
+---
+- name: Скачать setup_linux.sh
+  get_url:
+    url: https://github.com/cysic-labs/cysic-phase3/releases/download/v1.0.0/setup_linux.sh
+    dest: /home/cysic/setup_linux.sh
+    mode: '0755'
+    owner: root
+    group: root
+
+- name: Сделать владельцем cysic и дать права на запуск setup_linux.sh
+  file:
+    path: /home/cysic/setup_linux.sh
+    owner: cysic
+    group: cysic
+    mode: '0755'
+
+- name: Запустить setup_linux.sh от имени cysic
+  become: true
+  become_user: cysic
+  shell: bash /home/cysic/setup_linux.sh {{ wallet_address }}
+  args:
+    executable: /bin/bash
+
+- name: Убедиться, что директория /home/cysic/cysic-verifier существует
+  file:
+    path: /home/cysic/cysic-verifier
+    state: directory
+
+- name: Скопировать systemd-сервис
+  template:
+    src: cysic-verifier.service.j2
+    dest: /etc/systemd/system/cysic-verifier.service
+    mode: 0644
+
+- name: Перезапустить и включить сервис
+  systemd:
+    name: cysic-verifier
+    enabled: true
+    state: restarted
+    daemon_reload: true

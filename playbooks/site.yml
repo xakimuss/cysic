@@ -1,0 +1,14 @@
+---
+- name: добавление пользователя 
+  hosts: root
+  become: true
+  roles:
+    - AddUser
+
+- name: установка сервиса cysic
+  hosts: root
+  remote_user: cysic
+  become: false
+  roles:
+    - cysic
+

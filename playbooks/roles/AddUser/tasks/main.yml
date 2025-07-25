@@ -1,0 +1,26 @@
+---
+    - name: Создать пользователя с паролем
+      user:
+        name: "{{ item.name }}"
+        password: "{{ item.password | password_hash('sha512', 'somesalt') }}"
+        shell: /bin/bash
+        state: present
+        create_home: yes
+      loop: "{{ users }}"
+
+    - name: Добавить пользователей в группу sudo
+      user:
+        name: "{{ item.name }}"
+        groups: sudo
+        append: yes
+      loop: "{{ users }}"
+
+    - name: Добавить правило NOPASSWD в sudoers для каждого пользователя
+      copy:
+        dest: "/etc/sudoers.d/{{ item.name }}"
+        content: "{{ item.name }} ALL=(ALL) NOPASSWD: ALL\n"
+        owner: root
+        group: root
+        mode: '0440'
+      loop: "{{ users }}"
+
